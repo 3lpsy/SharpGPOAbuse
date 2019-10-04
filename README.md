@@ -12,7 +12,7 @@ SharpGPOAbuse has been built against .NET 3.5 and is compatible with Visual Stud
 Modify line `36` to define the attack type.
 e.g. `StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");`
 
-Modify the `const` strings (line `11` and onwards) to define the necessary options for the chosen attack type.
+Modify the strings (line `11` and onwards) to define the necessary options for the chosen attack type.
 
 ## Attacks Types ## 
 Currently SharpGPOAbuse supports the following options:
