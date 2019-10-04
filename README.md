@@ -53,8 +53,8 @@ LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, Dis
 
 ### Configuring a User or Computer Logon Script  
 ```c#
-string ScriptName = "";
-string ScriptContent = "";
+string ScriptName = "Startup.bat";
+string ScriptContent = "powershell.exe -Sta -Nop -Window Hidden -EncodedCommand <>";
 string GPOName = "";
 
 StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
