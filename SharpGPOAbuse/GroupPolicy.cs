@@ -34,7 +34,7 @@ namespace SharpGPOAbuse
             }
             if (string.IsNullOrEmpty(GPOGuid))
             {
-                Console.Error.WriteLine("[!] Could not retrieve the GPO GUID. {0}", e.Message);
+                Console.Error.WriteLine("[!] Could not retrieve the GPO GUID.");
             }
 
             Console.WriteLine($"[+] GUID of {GPOName} is: {GPOGuid}");
