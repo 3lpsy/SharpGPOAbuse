@@ -29,7 +29,7 @@ Currently SharpGPOAbuse supports the following options:
 ## Attack Options
 
 ### Adding User Rights 
-```
+```c#
 string[] UserRights = { "", "" };
 string UserAccount = "";
 string GPOName = "";
@@ -44,7 +44,7 @@ SeTrustedCredManAccessPrivilege, SeNetworkLogonRight, SeTcbPrivilege, SeMachineA
 ```
 
 ### Adding a Local Admin 
-```
+```c#
 string UserAccount = "";
 string GPOName = "";
 
@@ -52,7 +52,7 @@ LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, Dis
 ```
 
 ### Configuring a User or Computer Logon Script  
-```
+```c#
 string ScriptName = "";
 string ScriptContent = "";
 string GPOName = "";
@@ -61,7 +61,7 @@ StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainCont
 ```
 
 ### Configuring a Computer or User Immediate Task  
-```
+```c#
 string TaskName = "";
 string Author = "NT AUTHORITY\\SYSTEM";
 string Command = "powershell.exe";
