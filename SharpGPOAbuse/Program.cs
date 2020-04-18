@@ -114,7 +114,6 @@ namespace SharpGPOAbuse
           if (AttackName.ToLower() == "addnewrights") {
             required = new string[] { "gponame", "useraccount", "userrights" };
             if (ContainsAll(arguments, required)) {
-              DebugArgs(arguments, required);
               GPOName = arguments["gponame"];
               UserAccount = arguments["useraccount"];
               UserRights = arguments["userrights"].Split(',');
@@ -127,8 +126,6 @@ namespace SharpGPOAbuse
           } else if (AttackName.ToLower() == "newlocaladmin") {
             required = new string[] { "gponame", "useraccount" };
             if (ContainsAll(arguments, required)) {
-              DebugArgs(arguments, required);
-
               GPOName = arguments["gponame"];
               UserAccount = arguments["useraccount"];
               LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
@@ -140,7 +137,6 @@ namespace SharpGPOAbuse
           } else if (AttackName.ToLower() == "newstartupscript") {
             required = new string[] { "gponame", "scriptname", "scriptcontent" };
             if (ContainsAll(arguments, required)) {
-              DebugArgs(arguments, required);
               GPOName = arguments["gponame"];
               ScriptName = arguments["scriptname"];
               ScriptContent = arguments["scriptcontent"];
@@ -154,8 +150,6 @@ namespace SharpGPOAbuse
             required = new string[] { "gponame", "author", "taskname", "command", "arguments" };
 
             if (ContainsAll(arguments, required)) {
-              DebugArgs(arguments, required);
-
               GPOName = arguments["gponame"];
               Author = arguments["author"];
               TaskName = arguments["taskname"];
@@ -216,7 +210,7 @@ namespace SharpGPOAbuse
         key = keys[i];
         if (arguments.ContainsKey(key)) {
           val = arguments[key];
-          Console.WriteLine($"Argument {key}: {val}");
+          Console.WriteLine($"[+] Argument {key}: {val}");
         }
       }
     }
