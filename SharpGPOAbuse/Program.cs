@@ -24,6 +24,9 @@ namespace SharpGPOAbuse
         string[] DCs;
         string DistinguishedName = "CN=Policies,CN=System";
 
+        Console.WriteLine($"[+] Domain = {DomainName}");
+        Console.WriteLine($"[+] Domain Controller = {DomainController}");
+        Console.WriteLine($"[+] Distinguished Name = {DistinguishedName}");
 
         DCs = DomainName.Split('.');
 
@@ -35,7 +38,7 @@ namespace SharpGPOAbuse
           string AttackName = args[0];
           if (AttackName.ToLower() == "addnewrights") {
             if (args.Length == 4) {
-              PrintInfo();
+
               GPOName = args[1];
               UserAccount = args[2];
               UserRights = args[3].Split(',');
@@ -47,7 +50,7 @@ namespace SharpGPOAbuse
 
           } else if (AttackName.ToLower() == "newlocaladmin") {
             if (args.Length == 3) {
-              PrintInfo();
+
 
               GPOName = args[1];
               UserAccount = args[2];
@@ -59,7 +62,7 @@ namespace SharpGPOAbuse
 
           } else if (AttackName.ToLower() == "newstartupscript") {
             if (args.Length == 4) {
-              PrintInfo();
+
               GPOName = args[1];
               ScriptName = args[2];
               ScriptContent = args[3];
@@ -71,7 +74,7 @@ namespace SharpGPOAbuse
 
           } else if (AttackName.ToLower() == "newimmediatetask") {
             if (args.Length == 6) {
-              PrintInfo();
+
               GPOName = args[1];
               Author = args[2];
               TaskName = args[3];
@@ -108,13 +111,6 @@ namespace SharpGPOAbuse
       Console.WriteLine("    SharpGPOAbuse.exe NewStartupScript [GPOName] [UserAccount] [ScriptContent]");
       Console.WriteLine("  NewImmediateTask:");
       Console.WriteLine("    SharpGPOAbuse.exe NewImmediateTask [GPOName] [Author] [TaskName] [CommandPath] [Arguments]");
-    }
-
-    public static void PrintInfo()
-    {
-      Console.WriteLine($"[+] Domain = {DomainName}");
-      Console.WriteLine($"[+] Domain Controller = {DomainController}");
-      Console.WriteLine($"[+] Distinguished Name = {DistinguishedName}");
     }
   }
 }
