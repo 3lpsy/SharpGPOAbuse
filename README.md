@@ -12,16 +12,19 @@ SharpGPOAbuse has been built against .NET 3.5 and is compatible with Visual Stud
 
 ## Usage
 
+You can use the following CLI interface. The Assembly attempts to parse out options based on equal signs and special keywords so you do not need to (and should not) escape anything or use quotes.
+
 ```
 SharpGPOAbuse (Friendly Fork)
+
   AddNewRights:
-    SharpGPOAbuse.exe AddNewRights [GPOName] [UserAccount] [UserRights CSV]
-  NewLocalAdmin:");
-    SharpGPOAbuse.exe NewLocalAdmin [GPOName] [UserAccount]
-  NewStartupScript:");
-    SharpGPOAbuse.exe NewStartupScript [GPOName] [UserAccount] [ScriptContent]
-  NewImmediateTask:");
-    SharpGPOAbuse.exe NewImmediateTask [GPOName] [Author] [TaskName] [CommandPath] [Arguments]
+    SharpGPOAbuse.exe attack=AddNewRights gponame=Vuln GPO useraccount=SomeAccount userrights=someright1,someright2,someright3
+  NewLocalAdmin:
+    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=Vuln GPO useraccount=SomeAccount
+  NewStartupScript:
+    SharpGPOAbuse.exe attack=NewStartupScript gponame=Vuln GPO scriptname=ScriptName scriptcontent=my script content
+  NewImmediateTask:
+    SharpGPOAbuse.exe attack=NewImmediateTask gponame=Vuln GPO author=Author taskname=My Special Task command=C:\some\path\to.exe arguments=some cli args
 ```
 
 ## Attacks Types
