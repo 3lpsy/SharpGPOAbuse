@@ -6,6 +6,44 @@ namespace SharpGPOAbuse
 {
   class Program
   {
+
+    public static string ChopEnd(string source, string value)
+    {
+      if (!source.EndsWith(value))
+        return source;
+
+      return source.Remove(source.LastIndexOf(value));
+    }
+
+    public static bool HasWalkedBackKey(int i, string allargs, string[] keys)
+    {
+      return GetWalkedBackKey(i, allargs, keys).Length > 0;
+    }
+
+    public static string GetWalkedBackKey(int i, string allargs, string[] keys)
+    {
+      int j = i - 1;
+      char curr;
+      string rcandidate = String.Empty;
+      string candidate = String.Empty;
+
+      if (allargs.Length > 0 && j >= 0) {
+        while (j >= 0 && curr != " ") {
+          curr = allargs[j];
+          rcandidate = rcandidate + curr;
+          j = j - 1;
+        }
+        char[] charsToTrim = { ' ' };
+        rcandidate = rcandidate.TrimEnd(charsToTrim);
+        candidate = ReverseString(rcandidate);
+        int pos = Array.IndexOf(keys, candidate);
+        if (pos > -1) {
+          return candidate;
+        }
+      }
+      return String.Empty;
+
+    }
     static void Main(string[] args)
     {
 
@@ -22,6 +60,45 @@ namespace SharpGPOAbuse
       string[] required;
 
       try {
+
+        string[] keys = new string[] { "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments" };
+
+        var arguments = new Dictionary<string, string>();
+        string allargs = String.Join(" ", args);
+        string oldkey = String.Empty;
+
+        string currkey = String.Empty;
+        string currval = String.Empty;
+
+        // mynew=friend never=believes potatoe=darkess of the soul==
+        for (int i = 0; i < allargs.Length; i++) {
+          if (i == allargs.Length - 1 && currkey.Length > 0 && !arguments.ContainsKey(currkey)) {
+            currval = currval + allargs[i];
+            arguments[currkey] = currval;
+          } else if (i == "=" && HasWalkedBackKey(i, allargs, keys)) {
+            oldkey = currkey;
+            currkey = GetWalkedBackKey(i, allargs, keys);
+            //  Save previous if exists
+            if (oldkey.Length > 0) {
+              char[] charsToTrim = { ' ' };
+              arguments[oldkey] = ChopEnd(currval, currkey).TrimEnd(charsToTrim);
+            }
+            currval = String.Empty;
+          } else {
+            currval = currval + allargs[i];
+          }
+        }
+
+
+        // foreach (string argument in args) {
+        //   int idx = argument.IndexOf('=');
+        //   if (idx > 0)
+        //     arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
+        // }
+
+        DebugArgs(arguments, keys);
+
+
         Domain currentDomain = Domain.GetCurrentDomain();
         string DomainController = currentDomain.PdcRoleOwner.Name.ToLower();
         string DomainName = currentDomain.Name.ToLower();
@@ -39,21 +116,12 @@ namespace SharpGPOAbuse
           DistinguishedName += ",DC=" + DC;
         }
 
-        var arguments = new Dictionary<string, string>();
-
-        foreach (string argument in args) {
-          int idx = argument.IndexOf('=');
-          if (idx > 0)
-            arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
-        }
-
         if (arguments.ContainsKey("attack")) {
           string AttackName = arguments["attack"];
           if (AttackName.ToLower() == "addnewrights") {
             required = new string[] { "gponame", "useraccount", "userrights" };
             if (ContainsAll(arguments, required)) {
               DebugArgs(arguments, required);
-
               GPOName = arguments["gponame"];
               UserAccount = arguments["useraccount"];
               UserRights = arguments["userrights"].Split(',');
@@ -158,6 +226,12 @@ namespace SharpGPOAbuse
           Console.WriteLine($"Argument {key}: {val}");
         }
       }
+    }
+    public static string ReverseString(string s)
+    {
+      char[] charArray = s.ToCharArray();
+      Array.Reverse(charArray);
+      return new string(charArray);
     }
   }
 }
