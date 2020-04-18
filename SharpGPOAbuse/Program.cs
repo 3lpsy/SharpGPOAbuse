@@ -16,6 +16,8 @@ namespace SharpGPOAbuse
       string TaskName;
       string Command;
       string Arguments;
+
+      string required;
       try {
         Domain currentDomain = Domain.GetCurrentDomain();
         string DomainController = currentDomain.PdcRoleOwner.Name.ToLower();
@@ -34,62 +36,70 @@ namespace SharpGPOAbuse
           DistinguishedName += ",DC=" + DC;
         }
 
-        if (args.Length > 0) {
-          string AttackName = args[0];
-          if (AttackName.ToLower() == "addnewrights") {
-            if (args.Length == 4) {
+        var arguments = new Dictionary<string, string>();
 
-              GPOName = args[1];
-              UserAccount = args[2];
-              UserRights = args[3].Split(',');
+        foreach (string argument in args) {
+          int idx = argument.IndexOf('=');
+          if (idx > 0)
+            arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
+        }
+
+        if (arguments.ContainsKey("attack")) {
+          string AttackName = arguments["attack"];
+          if (AttackName.ToLower() == "addnewrights") {
+            required = new string[] { "gponame", "useraccount", "userrights" };
+            if (ContainsAll(arguments, required)) {
+              DebugArgs(arguments, required);
+
+              GPOName = arguments["gponame"];
+              UserAccount = arguments["useraccount"];
+              UserRights = arguments["userrights"].Split(',');
               UserRightAssignment.AddNewRights(DomainName, DomainController, GPOName, DistinguishedName, UserRights, UserAccount);
             } else {
-              Console.WriteLine("Invalid Argument Length for Attack Type!");
-              ListDebugArgs(args, 4);
-
+              Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
             }
 
           } else if (AttackName.ToLower() == "newlocaladmin") {
-            if (args.Length == 3) {
+            required = new string[] { "gponame", "useraccount" };
+            if (ContainsAll(arguments, required)) {
+              DebugArgs(arguments, required);
 
-
-              GPOName = args[1];
-              UserAccount = args[2];
+              GPOName = arguments["gponame"];
+              UserAccount = arguments["useraccount"];
               LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
             } else {
-              Console.WriteLine("Invalid Argument Length for Attack Type!");
-              ListDebugArgs(args, 3);
-
+              Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
             }
 
           } else if (AttackName.ToLower() == "newstartupscript") {
-            if (args.Length == 4) {
-
-              GPOName = args[1];
-              ScriptName = args[2];
-              ScriptContent = args[3];
+            required = new string[] { "gponame", "scriptname", "scriptcontent" };
+            if (ContainsAll(arguments, required)) {
+              DebugArgs(arguments, required);
+              GPOName = arguments["gponame"];
+              ScriptName = arguments["scriptname"];
+              ScriptContent = arguments["scriptcontent"];
               StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
             } else {
-              Console.WriteLine("Invalid Argument Length for Attack Type!");
-              ListDebugArgs(args, 4);
+              Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
             }
 
           } else if (AttackName.ToLower() == "newimmediatetask") {
-            if (args.Length == 6) {
+            required = new string[] { "gponame", "author", "taskname", "command", "arguments" };
 
-              GPOName = args[1];
-              Author = args[2];
-              TaskName = args[3];
-              Command = args[4];
-              Arguments = args[5];
+            if (ContainsAll(arguments, required)) {
+              DebugArgs(arguments, required);
+
+              GPOName = arguments["gponame"];
+              Author = arguments["author"];
+              TaskName = arguments["taskname"];
+              Command = arguments["command"];
+              Arguments = arguments["arguments"];
               ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, "Computer");
             } else {
-              Console.WriteLine("Invalid Argument Length for Attack Type!");
-              ListDebugArgs(args, 6);
-
+              Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
             }
 
@@ -99,6 +109,8 @@ namespace SharpGPOAbuse
 
           }
         } else {
+          Console.WriteLine("No Attack Provided!");
+
           PrintHelp();
         }
       } catch (Exception e) {
@@ -111,24 +123,37 @@ namespace SharpGPOAbuse
       Console.WriteLine("SharpGPOAbuse (Friendly Fork)");
       Console.WriteLine("");
       Console.WriteLine("  AddNewRights:");
-      Console.WriteLine("    SharpGPOAbuse.exe AddNewRights [GPOName] [UserAccount] [UserRights CSV]");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=AddNewRights gponame=GPOName useraccount=UserAccount userrights=UserRightsCSV");
       Console.WriteLine("  NewLocalAdmin:");
-      Console.WriteLine("    SharpGPOAbuse.exe NewLocalAdmin [GPOName] [UserAccount]");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=GPOName useraccount=UserAccount");
       Console.WriteLine("  NewStartupScript:");
-      Console.WriteLine("    SharpGPOAbuse.exe NewStartupScript [GPOName] [UserAccount] [ScriptContent]");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewStartupScript gponame=GPOName scriptname=ScriptName scriptcontent=ScriptContent");
       Console.WriteLine("  NewImmediateTask:");
-      Console.WriteLine("    SharpGPOAbuse.exe NewImmediateTask [GPOName] [Author] [TaskName] [CommandPath] [Arguments]");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewImmediateTask gponame=GPOName author=Author taskname=TaskName command=Command arguments=Arguments");
     }
 
-    public static void ListDebugArgs(string[] args, int expected)
+    public static bool ContainsAll(Dictionary<string, string> arguments, string[] keys)
     {
-      Console.WriteLine($"Expected {expected} arguments.");
-      int j;
-      string arg;
-      for (int i = 0; i < args.Length; i++) {
-        j = i + 1;
-        arg = args[i];
-        Console.WriteLine($"Argument {j}: {arg}");
+      string key;
+      for (int i = 0; i < keys.Length; i++) {
+        key = keys[i];
+        if (!arguments.ContainsKey(key)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public static void DebugArgs(Dictionary<string, string> arguments, string[] keys)
+    {
+      string key;
+      string val;
+      for (int i = 0; i < keys.Length; i++) {
+        key = keys[i];
+        if (arguments.ContainsKey(key)) {
+          val = arguments[key];
+          Console.WriteLine($"Argument {key}: {val}");
+        }
       }
     }
   }
