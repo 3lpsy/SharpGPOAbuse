@@ -1,5 +1,7 @@
 ﻿using System;
 using System.DirectoryServices.ActiveDirectory;
+using System.Collections.Generic;
+
 namespace SharpGPOAbuse
 {
   class Program
@@ -17,7 +19,8 @@ namespace SharpGPOAbuse
       string Command;
       string Arguments;
 
-      string required;
+      string[] required;
+
       try {
         Domain currentDomain = Domain.GetCurrentDomain();
         string DomainController = currentDomain.PdcRoleOwner.Name.ToLower();
