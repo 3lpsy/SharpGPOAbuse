@@ -33,7 +33,6 @@ namespace SharpGPOAbuse
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
               PrintHelp();
-              Environment.Exit(1);
             }
 
           } else if (AttackName.ToLower() == "newlocaladmin") {
@@ -46,7 +45,6 @@ namespace SharpGPOAbuse
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
               PrintHelp();
-              Environment.Exit(1);
             }
 
           } else if (AttackName.ToLower() == "newstartupscript") {
@@ -59,7 +57,6 @@ namespace SharpGPOAbuse
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
               PrintHelp();
-              Environment.Exit(1);
             }
 
           } else if (AttackName.ToLower() == "newimmediatetask") {
@@ -74,18 +71,15 @@ namespace SharpGPOAbuse
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
               PrintHelp();
-              Environment.Exit(1);
             }
 
           } else {
             Console.WriteLine("Unsupported Attack Type! Sorry!");
             PrintHelp();
-            Environment.Exit(1);
 
           }
         } else {
           PrintHelp();
-          Environment.Exit(1);
         }
       } catch (Exception e) {
         Console.Error.WriteLine("[!] {0}", e.Message);
