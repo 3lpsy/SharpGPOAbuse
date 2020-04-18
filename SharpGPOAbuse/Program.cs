@@ -45,6 +45,8 @@ namespace SharpGPOAbuse
               UserRightAssignment.AddNewRights(DomainName, DomainController, GPOName, DistinguishedName, UserRights, UserAccount);
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
+              ListDebugArgs(args, 4);
+
               PrintHelp();
             }
 
@@ -57,6 +59,8 @@ namespace SharpGPOAbuse
               LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
+              ListDebugArgs(args, 3);
+
               PrintHelp();
             }
 
@@ -69,6 +73,7 @@ namespace SharpGPOAbuse
               StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
+              ListDebugArgs(args, 4);
               PrintHelp();
             }
 
@@ -83,6 +88,8 @@ namespace SharpGPOAbuse
               ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, "Computer");
             } else {
               Console.WriteLine("Invalid Argument Length for Attack Type!");
+              ListDebugArgs(args, 6);
+
               PrintHelp();
             }
 
@@ -111,6 +118,18 @@ namespace SharpGPOAbuse
       Console.WriteLine("    SharpGPOAbuse.exe NewStartupScript [GPOName] [UserAccount] [ScriptContent]");
       Console.WriteLine("  NewImmediateTask:");
       Console.WriteLine("    SharpGPOAbuse.exe NewImmediateTask [GPOName] [Author] [TaskName] [CommandPath] [Arguments]");
+    }
+
+    public static void ListDebugArgs(string[] args, int expected)
+    {
+      Console.WriteLine($"Expected {expected} arguments.");
+      int j;
+      string arg;
+      for (int i = 0; i < args.Length; i++) {
+        j = i + 1;
+        arg = args[i];
+        Console.WriteLine($"Argument {j}: {arg}");
+      }
     }
   }
 }
