@@ -61,7 +61,7 @@ namespace SharpGPOAbuse
 
       try {
 
-        string[] keys = new string[] { "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments" };
+        string[] keys = new string[] { "attack", "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments" };
 
         var arguments = new Dictionary<string, string>();
         string allargs = String.Join(" ", args);

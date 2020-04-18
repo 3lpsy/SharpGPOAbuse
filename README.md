@@ -4,7 +4,7 @@ SharpGPOAbuse is a .NET application written in C# that can be used to take advan
 
 More details can be found at the following blog post: [https://labs.f-secure.com/tools/sharpgpoabuse](https://labs.f-secure.com/tools/sharpgpoabuse)
 
-This fork provides some modifications for use with Covenant's Grunts. The most notable changes are removing the `Environment.Exit()` calls that will kill a Grunt (since they do not create sacrificial processes for post-ex jobs) and removing the dependency for CommandLineParser.
+This fork of a fork provides some modifications for use with Covenant's Grunts. The most notable changes are removing the `Environment.Exit()` calls that will kill a Grunt (since they do not create sacrificial processes for post-ex jobs), removing the dependency for CommandLineParser, and the implementation of a custom parser. Because Covenant splits on spaces, the Assembly will combine all arguments and attempt to parse out options based on equal signs. For this reason, arguments are passed via `specialkeyword=Any Value`. There may be edge cases with the parser but the Assembly will tell you which options it interpreted.
 
 ## Compile Instructions
 
