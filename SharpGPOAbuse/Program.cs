@@ -23,13 +23,13 @@ namespace SharpGPOAbuse
     public static string GetWalkedBackKey(int i, string allargs, string[] keys)
     {
       int j = i - 1;
-      char curr;
+      string curr = String.Empty;
       string rcandidate = String.Empty;
       string candidate = String.Empty;
 
       if (allargs.Length > 0 && j >= 0) {
         while (j >= 0 && curr != " ") {
-          curr = allargs[j];
+          curr = allargs[j].ToString();
           rcandidate = rcandidate + curr;
           j = j - 1;
         }
@@ -75,7 +75,7 @@ namespace SharpGPOAbuse
           if (i == allargs.Length - 1 && currkey.Length > 0 && !arguments.ContainsKey(currkey)) {
             currval = currval + allargs[i];
             arguments[currkey] = currval;
-          } else if (i == "=" && HasWalkedBackKey(i, allargs, keys)) {
+          } else if (allargs[i].ToString() == "=" && HasWalkedBackKey(i, allargs, keys)) {
             oldkey = currkey;
             currkey = GetWalkedBackKey(i, allargs, keys);
             //  Save previous if exists
@@ -88,13 +88,6 @@ namespace SharpGPOAbuse
             currval = currval + allargs[i];
           }
         }
-
-
-        // foreach (string argument in args) {
-        //   int idx = argument.IndexOf('=');
-        //   if (idx > 0)
-        //     arguments[argument.Substring(0, idx)] = argument.Substring(idx + 1);
-        // }
 
         DebugArgs(arguments, keys);
 
