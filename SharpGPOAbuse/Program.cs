@@ -57,12 +57,12 @@ namespace SharpGPOAbuse
       string Command;
       string Arguments;
       string ObjectType;
-
+      bool Force;
       string[] required;
 
       try {
 
-        string[] keys = new string[] { "attack", "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments", "type" };
+        string[] keys = new string[] { "attack", "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments", "type", "force" };
 
         var arguments = new Dictionary<string, string>();
         string allargs = String.Join(" ", args);
@@ -129,7 +129,14 @@ namespace SharpGPOAbuse
             if (ContainsAll(arguments, required)) {
               GPOName = arguments["gponame"];
               UserAccount = arguments["useraccount"];
-              LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, false);
+              if (arguments.ContainsKey("force") && arguments["force"].ToLower() == "true") {
+                Force = true;
+                Console.WriteLine($"[+] Argument force: Resolved to True");
+              } else {
+                Console.WriteLine($"[+] Argument force: Resolved to False");
+                Force = false;
+              }
+              LocalAdmin.NewLocalAdmin(UserAccount, DomainName, DomainController, GPOName, DistinguishedName, Force);
             } else {
               Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
@@ -154,7 +161,7 @@ namespace SharpGPOAbuse
             }
 
           } else if (AttackName.ToLower() == "newimmediatetask") {
-            required = new string[] { "gponame", "author", "taskname", "command", "arguments", "type" };
+            required = new string[] { "gponame", "author", "taskname", "command", "arguments" };
 
             if (ContainsAll(arguments, required)) {
               GPOName = arguments["gponame"];
@@ -162,13 +169,20 @@ namespace SharpGPOAbuse
               TaskName = arguments["taskname"];
               Command = arguments["command"];
               Arguments = arguments["arguments"];
-              if (arguments["type"].ToLower() == "computer") {
+              if (arguments.ContainsKey("type") && arguments["type"].ToLower() == "computer") {
                 ObjectType = "Computer";
               } else {
                 ObjectType = "User";
               }
               Console.WriteLine($"[+] Argument type: Resolved to {ObjectType}");
-              ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, ObjectType);
+              if (arguments.ContainsKey("force") && arguments["force"].ToLower() == "true") {
+                Force = true;
+                Console.WriteLine($"[+] Argument force: Resolved to True");
+              } else {
+                Console.WriteLine($"[+] Argument force: Resolved to False");
+                Force = false;
+              }
+              ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, Force, ObjectType);
             } else {
               Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
