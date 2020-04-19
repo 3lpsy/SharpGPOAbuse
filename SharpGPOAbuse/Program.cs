@@ -56,12 +56,13 @@ namespace SharpGPOAbuse
       string TaskName;
       string Command;
       string Arguments;
+      string ObjectType;
 
       string[] required;
 
       try {
 
-        string[] keys = new string[] { "attack", "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments" };
+        string[] keys = new string[] { "attack", "gponame", "useraccount", "userrights", "scriptname", "scriptcontent", "author", "taskname", "command", "arguments", "type" };
 
         var arguments = new Dictionary<string, string>();
         string allargs = String.Join(" ", args);
@@ -135,19 +136,25 @@ namespace SharpGPOAbuse
             }
 
           } else if (AttackName.ToLower() == "newstartupscript") {
-            required = new string[] { "gponame", "scriptname", "scriptcontent" };
+            required = new string[] { "gponame", "scriptname", "scriptcontent", "type" };
             if (ContainsAll(arguments, required)) {
               GPOName = arguments["gponame"];
               ScriptName = arguments["scriptname"];
               ScriptContent = arguments["scriptcontent"];
-              StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, "User");
+              if (arguments["type"].ToLower() == "computer") {
+                ObjectType = "Computer";
+              } else {
+                ObjectType = "User";
+              }
+              Console.WriteLine($"[+] Argument type: Resolved to {ObjectType}");
+              StartupScript.NewStartupScript(ScriptName, ScriptContent, DomainName, DomainController, GPOName, DistinguishedName, ObjectType);
             } else {
               Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
             }
 
           } else if (AttackName.ToLower() == "newimmediatetask") {
-            required = new string[] { "gponame", "author", "taskname", "command", "arguments" };
+            required = new string[] { "gponame", "author", "taskname", "command", "arguments", "type" };
 
             if (ContainsAll(arguments, required)) {
               GPOName = arguments["gponame"];
@@ -155,7 +162,13 @@ namespace SharpGPOAbuse
               TaskName = arguments["taskname"];
               Command = arguments["command"];
               Arguments = arguments["arguments"];
-              ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, "Computer");
+              if (arguments["type"].ToLower() == "computer") {
+                ObjectType = "Computer";
+              } else {
+                ObjectType = "User";
+              }
+              Console.WriteLine($"[+] Argument type: Resolved to {ObjectType}");
+              ScheduledTask.NewImmediateTask(DomainName, DomainController, GPOName, DistinguishedName, TaskName, Author, Arguments, Command, false, ObjectType);
             } else {
               Console.WriteLine("Missing Arguments for Attack Type!");
               PrintHelp();
@@ -181,13 +194,13 @@ namespace SharpGPOAbuse
       Console.WriteLine("SharpGPOAbuse (Friendly Fork)");
       Console.WriteLine("");
       Console.WriteLine("  AddNewRights:");
-      Console.WriteLine("    SharpGPOAbuse.exe attack=AddNewRights gponame=GPOName useraccount=UserAccount userrights=UserRightsCSV");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=AddNewRights gponame=Vuln GPO useraccount=UserAccount userrights=UserRightsCSV");
       Console.WriteLine("  NewLocalAdmin:");
-      Console.WriteLine("    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=GPOName useraccount=UserAccount");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=Vuln GPO useraccount=UserAccount");
       Console.WriteLine("  NewStartupScript:");
-      Console.WriteLine("    SharpGPOAbuse.exe attack=NewStartupScript gponame=GPOName scriptname=ScriptName scriptcontent=ScriptContent");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewStartupScript gponame=Vuln GPO scriptname=ScriptName scriptcontent=ScriptContent type=[Computer|User]");
       Console.WriteLine("  NewImmediateTask:");
-      Console.WriteLine("    SharpGPOAbuse.exe attack=NewImmediateTask gponame=GPOName author=Author taskname=TaskName command=Command arguments=Arguments");
+      Console.WriteLine("    SharpGPOAbuse.exe attack=NewImmediateTask gponame=Vuln GPO author=Author taskname=TaskName command=C:\\Path\\to\\command.exe arguments=some cli args");
     }
 
     public static bool ContainsAll(Dictionary<string, string> arguments, string[] keys)
