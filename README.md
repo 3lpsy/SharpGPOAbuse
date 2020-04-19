@@ -24,7 +24,7 @@ SharpGPOAbuse (Friendly Fork)
   NewStartupScript:
     SharpGPOAbuse.exe attack=NewStartupScript gponame=Vuln GPO scriptname=ScriptName scriptcontent=my script content type=User
   NewImmediateTask:
-    SharpGPOAbuse.exe attack=NewImmediateTask gponame=Vuln GPO author=NT AUTHORITY\SYSTEM taskname=My Special Task command=C:\some\path\to.exe arguments=some cli args type=Computer
+    SharpGPOAbuse.exe attack=NewImmediateTask gponame=Vuln GPO author=NT AUTHORITY\SYSTEM taskname=My Special Task command=C:\some\path\to.exe arguments=some cli args type=Computer force=True
 ```
 
 ## Attacks Types

@@ -143,12 +143,12 @@ namespace SharpGPOAbuse
             }
 
           } else if (AttackName.ToLower() == "newstartupscript") {
-            required = new string[] { "gponame", "scriptname", "scriptcontent", "type" };
+            required = new string[] { "gponame", "scriptname", "scriptcontent" };
             if (ContainsAll(arguments, required)) {
               GPOName = arguments["gponame"];
               ScriptName = arguments["scriptname"];
               ScriptContent = arguments["scriptcontent"];
-              if (arguments["type"].ToLower() == "computer") {
+              if (arguments.ContainsKey("type") && arguments["type"].ToLower() == "computer") {
                 ObjectType = "Computer";
               } else {
                 ObjectType = "User";
